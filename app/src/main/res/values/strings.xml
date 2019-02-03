@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">bib Stundenplan</string>
+    <string name="start_title">STUNDENPLAN</string>
+    <string name="start_input_class">Klasse</string>
+    <string name="start_input_password">Passwort</string>
+    <string name="start_btn_plan">Zum Stundenplan</string>
+    <string name="nav_timetable">Stundenplan</string>
+    <string name="nav_exams">Klausuren</string>
+    <string name="nav_memory">Erinnerungen</string>
+    <string name="nav_settings">Einstellungen</string>
+    <string name="plan_datepicker">Datum wählen</string>
+    <string name="exams_title">KLAUSUREN</string>
+    <string name="exams_subtitle">Klasse</string>
+    <string name="memory_title">Deine ERINNERUNGEN</string>
+    <string name="settings_title">EINSTELLUNGEN</string>
+    <string name="settings_1">Benachrichtungen erhalten</string>
+    <string name="settings_2">Automatisch aktualisieren</string>
+    <string name="settings_3">Aktualisierungs-Intervall</string>
+    <string name="settings_4">Klasse ändern</string>
+    <string name="settings_btn_delete">Alle Erinnerungen löschen</string>
+</resources>
