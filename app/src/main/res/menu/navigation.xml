@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_plan"
+        android:icon="@drawable/nav_plan"
+        android:title="@string/nav_timetable"/>
+
+    <item
+        android:id="@+id/nav_exams"
+        android:state_checked="true"
+        android:icon="@drawable/nav_exams"
+        android:title="@string/nav_exams"/>
+
+    <item
+        android:id="@+id/nav_memory"
+        android:icon="@drawable/nav_memory"
+        android:title="@string/nav_memory"/>
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/nav_settings"
+        android:title="@string/nav_settings"/>
+
+</menu>
