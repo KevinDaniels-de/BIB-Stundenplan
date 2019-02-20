@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import de.kevindaniels.bib_stundenplan.fragments.FragmentExams;
 import de.kevindaniels.bib_stundenplan.fragments.FragmentTimeTable;
 
 public class UrlThread extends AsyncTask<String, Void, Void> {
@@ -26,7 +27,7 @@ public class UrlThread extends AsyncTask<String, Void, Void> {
             c.setRequestMethod("GET");
             c.setDoOutput(true);
             c.connect();
-            File outputFile = new File(mContext.getFilesDir(), "test.ics");
+            File outputFile = new File(mContext.getFilesDir(), "stundenplan.ics");
             FileOutputStream fos = new FileOutputStream(outputFile);
             InputStream is = c.getInputStream();
 
@@ -50,11 +51,11 @@ public class UrlThread extends AsyncTask<String, Void, Void> {
         FragmentTimeTable.dataFromFile = de.kevindaniels.bib_stundenplan.helper.FileReader.readFile(context, path);
         // Erstellt die einzelnen Unterrichts-Stunden
         FragmentTimeTable.tableSubjectList = FragmentTimeTable.createTimetable();
-        // Berechnet die Reichweite die der Stundenplan umfasst
-        FragmentTimeTable.calenderRange = FragmentTimeTable.calenderRange();
-        // Erstellt beide Listen-Items
-        FragmentTimeTable.pickerList = FragmentTimeTable.createPickerList(FragmentTimeTable.calenderRange);
-        FragmentTimeTable.tableList = FragmentTimeTable.createTableList(FragmentTimeTable.calenderRange);
+        FragmentExams.stundenplan = FragmentTimeTable.tableSubjectList;
+        // Erstellt beide RecycleView-Items
+        FragmentTimeTable.pickerList = FragmentTimeTable.createPickerList();
+        FragmentTimeTable.tableList = FragmentTimeTable.createTableList();
+        FragmentExams.examsList = FragmentExams.createExamsList();
     }
 
 }

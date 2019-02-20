@@ -46,8 +46,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/layout_plan_picker">
-
-    </android.support.v7.widget.RecyclerView>
+        tools:listitem="@layout/layout_plan_picker" />
 
 </android.support.constraint.ConstraintLayout>

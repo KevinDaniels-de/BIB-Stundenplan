@@ -1,6 +1,5 @@
 package de.kevindaniels.bib_stundenplan.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,9 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,8 +20,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 
 import de.kevindaniels.bib_stundenplan.R;
 import de.kevindaniels.bib_stundenplan.adapter.PickerAdapter;
@@ -47,13 +43,11 @@ public class FragmentTimeTable extends Fragment implements PickerAdapter.ItemCli
     private LinearLayoutManager linearLayoutManagerPicker;
     private LinearLayoutManager linearLayoutManagerPlan;
     private RecyclerView.SmoothScroller smoothScroller;
-    public static long calenderRange;
-    public static Date calenderStart;
     public static ArrayList<TableSubjectItem> tableSubjectList;
     public static ArrayList<TableDayItem> tableList;
     public static ArrayList<PickerItem> pickerList;
     public static List<String> dataFromFile;
-    private int indexCurrentDay = 0;
+    private static int indexCurrentDay = 0;
 
     public static class CustomComparator implements Comparator<TableSubjectItem> {
         @Override
@@ -66,7 +60,6 @@ public class FragmentTimeTable extends Fragment implements PickerAdapter.ItemCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        JodaTimeAndroid.init(getActivity());
     }
 
     // Erzeugt die View (Layout)
@@ -83,7 +76,7 @@ public class FragmentTimeTable extends Fragment implements PickerAdapter.ItemCli
         UrlThread t = new UrlThread();
         t.myCustomTask(getActivity());
         t.execute(URL);
-        t.onPostExecute(getActivity(),"test.ics");
+        t.onPostExecute(getActivity(),"stundenplan.ics");
 
         /******** RECYCLERVIEW - PICKER ********/
         final RecyclerView RECYCLER_VIEW_PICKER = (RecyclerView) layout.findViewById(R.id.layoutPlanRecycleViewPicker);
@@ -128,7 +121,7 @@ public class FragmentTimeTable extends Fragment implements PickerAdapter.ItemCli
         /******** RECYCLERVIEW - PLAN END ********/
 
 
-        //Scroll to current day width 20 pixels from the left
+        //Scrollt zum aktuellen Tag
         scrollToPosition(indexCurrentDay);
 
         RECYCLER_VIEW_PICKER.postDelayed(new Runnable() {
@@ -170,6 +163,7 @@ public class FragmentTimeTable extends Fragment implements PickerAdapter.ItemCli
     }
 
     public static ArrayList<TableSubjectItem> createTimetable() {
+
         // Daten aus Datei
         List<String> data = dataFromFile;
 
@@ -181,170 +175,162 @@ public class FragmentTimeTable extends Fragment implements PickerAdapter.ItemCli
                     data.get(i).substring(27, 40),
                     data.get(i - 3).substring(8),
                     data.get(i).substring(36, 40),
-                    data.get(i + 1).substring(34, 38)
+                    data.get(i + 1).substring(34, 38),
+                    false
             ));
         }
 
         // Sortiert die Liste nach Datum
         Collections.sort(tableList, new CustomComparator());
 
-        ArrayList<TableSubjectItem> returnList = new ArrayList<>();
+        // HashMap die den kompletten Stundenplan enthalten wird
+        LinkedHashMap<String, TableSubjectItem> stundenplan = new LinkedHashMap<>();
 
-        while(!tableList.isEmpty()) {
-
-            returnList.add(tableList.get(0));
-            tableList.remove(0);
-
-            if(isSpecialDate(returnList.get(returnList.size()-1))) {
-                for(int i = 0; i < 4; i++) {
-                    returnList.add(new TableSubjectItem(
-                            returnList.get(returnList.size()-1).getTimeIndex().substring(0, 9) + "0000",
-                            "",
-                            "0000",
-                            "0000"));
-                }
-            }
-
+        // Besorgt sich das Start- und End-Datum
+        Calendar cStart = Calendar.getInstance();
+        Calendar cEnd = Calendar.getInstance();
+        try {
+            cStart.setTime(new SimpleDateFormat("yyyyMMdd").parse(tableList.get(0).getTimeIndex().substring(0,8)));
+            cEnd.setTime(new SimpleDateFormat("yyyyMMdd").parse(tableList.get(tableList.size()-1).getTimeIndex().substring(0,8)));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
-        String end = returnList.get(returnList.size()-1).getTimeIndex();
+        // Für jeden Kalender-Tag werden jeweils 5 leere Blöcke erstellt
+        for (Date date = cStart.getTime(); cStart.before(cEnd); cStart.add(Calendar.DATE, 1), date = cStart.getTime()) {
 
-        for(int i = 1; i < returnList.size(); i++) {
-            if(returnList.get(i).getTimeIndex().equals(end)) {
-                break;
+            DateFormat df = new SimpleDateFormat("yyyyMMdd");
+
+            stundenplan.put(df.format(date)+"T0800", new TableSubjectItem(df.format(date)+"T0800", "", "0000", "0000", true));
+            stundenplan.put(df.format(date)+"T0950", new TableSubjectItem(df.format(date)+"T0950", "", "0000", "0000", true));
+            stundenplan.put(df.format(date)+"T1130", new TableSubjectItem(df.format(date)+"T1130", "", "0000", "0000", true));
+            stundenplan.put(df.format(date)+"T1345", new TableSubjectItem(df.format(date)+"T1345", "", "0000", "0000", true));
+            stundenplan.put(df.format(date)+"T1530", new TableSubjectItem(df.format(date)+"T1530", "", "0000", "0000", true));
+        }
+
+        // Anhand des Schlüssels werden die Listen-Items nach und nach in den richtigen HashMap-Platz gelegt
+        for(int i = 0; i < tableList.size(); i++) {
+
+            Log.e("TERMIN", tableList.get(i).toString());
+
+            if(!isSpecialDate(tableList.get(i))) {
+                stundenplan.put(tableList.get(i).getTimeIndex(), tableList.get(i));
             }
 
-            if(!isSpecialDate(returnList.get(i-1))) {
-                switch (whichBlockIsMissing(returnList.get(i - 1), returnList.get(i))) {
-                    case "1":
-                        returnList.add(i, new TableSubjectItem(
-                                returnList.get(i).getTimeIndex().substring(0, 9) + "0800",
-                                "",
-                                "0800",
-                                "0930"));
-                        Log.e("INSERT", returnList.get(i).toString());
-                        i++;
-                        break;
-
-                    case "2":
-                        returnList.add(i, new TableSubjectItem(
-                                returnList.get(i - 1).getTimeIndex().substring(0, 9) + "0950",
-                                "",
-                                "0950",
-                                "1120"));
-                        Log.e("INSERT", returnList.get(i).toString());
-                        break;
-
-                    case "3":
-                        returnList.add(i, new TableSubjectItem(
-                                returnList.get(i - 1).getTimeIndex().substring(0, 9) + "1130",
-                                "",
-                                "1130",
-                                "1300"));
-                        Log.e("INSERT", returnList.get(i).toString());
-                        break;
-
-                    case "4":
-                        returnList.add(i, new TableSubjectItem(
-                                returnList.get(i - 1).getTimeIndex().substring(0, 9) + "1345",
-                                "",
-                                "1345",
-                                "1515"));
-                        Log.e("INSERT", returnList.get(i).toString());
-                        break;
-
-                    case "5":
-                        returnList.add(i, new TableSubjectItem(
-                                returnList.get(i - 1).getTimeIndex().substring(0, 9) + "1530",
-                                "",
-                                "1530",
-                                "1700"));
-                        Log.e("INSERT", returnList.get(i).toString());
-                        break;
-                }
+            else {
+                stundenplan.put(tableList.get(i).getTimeIndex().substring(0,8)+"T0800", tableList.get(i));
             }
         }
 
+        // Konvertiert die HashMap zurück in eine ArrayList
+        ArrayList<TableSubjectItem> returnList = new ArrayList<>(stundenplan.values());
 
         return returnList;
     }
 
-    private static String whichBlockIsMissing(TableSubjectItem previous, TableSubjectItem next) {
-        if(previous.getTimeStart().equals("0000")) return "special";
-        else if(previous.getTimeStart().equals("1530") && !next.getTimeStart().equals("0800")) return "1";
-        else if(previous.getTimeStart().equals("0800") && !next.getTimeStart().equals("0950")) return "2";
-        else if(previous.getTimeStart().equals("0950") && !next.getTimeStart().equals("1130")) return "3";
-        else if(previous.getTimeStart().equals("1130") && !next.getTimeStart().equals("1345")) return "4";
-        else if(previous.getTimeStart().equals("1345") && !next.getTimeStart().equals("1530")) return "5";
-
-        return "keiner";
-    }
-
     private static boolean isSpecialDate(TableSubjectItem date) {
+        // Wenn der Block von den üblichen Terminen abweicht wird der entsprechende Boolean zurückgeschickt
         if( date.getTimeStart().equals("0800") && date.getTimeEnd().equals("0930") ||
             date.getTimeStart().equals("0950") && date.getTimeEnd().equals("1120") ||
             date.getTimeStart().equals("1130") && date.getTimeEnd().equals("1300") ||
             date.getTimeStart().equals("1345") && date.getTimeEnd().equals("1515") ||
-            date.getTimeStart().equals("1530") && date.getTimeEnd().equals("1700") ||
-            date.getTimeStart().equals("0000")
+            date.getTimeStart().equals("1530") && date.getTimeEnd().equals("1700")
         ) {return false;}
 
         return true;
     }
 
-    public static long calenderRange() {
+    public static ArrayList<PickerItem> createPickerList() {
 
-        Date dateStart = new Date();
-        Date dateEnd = new Date();
+        // Liste für PickerItems
+        ArrayList<PickerItem> pickerList = new ArrayList<>();
 
+        // Besorgt sich das Start- und End-Datum
+        Calendar cStart = Calendar.getInstance();
+        Calendar cEnd = Calendar.getInstance();
         try {
-            dateStart = new SimpleDateFormat("yyyyMMdd'T'HHmm").parse(tableSubjectList.get(0).getTimeIndex());
-            dateEnd = new SimpleDateFormat("yyyyMMdd'T'HHmm").parse(tableSubjectList.get(tableSubjectList.size()-1).getTimeIndex());
+            Log.e("DSTART", tableSubjectList.get(0).getTimeIndex().substring(0,8));
+            Log.e("DEND", tableSubjectList.get(tableSubjectList.size()-1).getTimeIndex().substring(0,8));
+
+            cStart.setTime(new SimpleDateFormat("yyyyMMdd").parse(tableSubjectList.get(0).getTimeIndex().substring(0,8)));
+            cEnd.setTime(new SimpleDateFormat("yyyyMMdd").parse(tableSubjectList.get(tableSubjectList.size()-1).getTimeIndex().substring(0,8)));
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        calenderStart = dateStart;
+        int count = 0;
 
-        long difference = (dateStart.getTime() -  dateEnd.getTime()) / 86400000;
+        // Für jeden Kalendertag wird ein PickerItem erstellt
+        for (Date date = cStart.getTime(); cStart.before(cEnd); cStart.add(Calendar.DATE, 1), date = cStart.getTime()) {
 
-        return Math.abs(difference);
-    }
+            Log.e("DATUM", date.toString());
 
-    public static ArrayList<PickerItem> createPickerList(long range) {
-        // Liste für PickerItems
-        ArrayList<PickerItem> pickerList = new ArrayList<>();
-
-        // Schleife die die PickerItems erstellt
-        for (int i = 0; i < range; i++) {
-            // Formatiert ins gewünschte Dateformat
             DateFormat dateFormatMonth = new SimpleDateFormat("EEE");
             DateFormat dateFormatDay = new SimpleDateFormat("dd. MMM");
 
-            // Setzt das aktuelle Datum
-            Date dt = calenderStart;
-            Calendar c = Calendar.getInstance();
-            c.setTime(dt);
-            c.add(Calendar.DATE, i);
-            dt = c.getTime();
+            pickerList.add(new PickerItem(dateFormatMonth.format(date), dateFormatDay.format(date)));
 
-            pickerList.add(new PickerItem(dateFormatMonth.format(dt), dateFormatDay.format(dt)));
+            DateFormat dateComparison = new SimpleDateFormat("yyyyMMdd");
+
+            // Wenn der Tag mit dem heutigen Tag übereinstimmt wird der Index für den App-Start gesetzt
+            if(dateComparison.format(date).equals(dateComparison.format(new Date()))) {
+                indexCurrentDay = count;
+            }
+
+            count++;
         }
 
         return pickerList;
     }
 
-    public static ArrayList<TableDayItem> createTableList(long range) {
+    public static ArrayList<TableDayItem> createTableList() {
         // Liste für DatumItems und für die TableDayItem
         ArrayList<TableDayItem> tableList = new ArrayList<>();
 
+        // Für jeden Tag wird ein Item erstellt was jeweils 5 Blöcke enthält
         for(int i = 5; i < tableSubjectList.size(); i+=5) {
+            String topic1 = "";
+            String time1 = "";
+            String topic2 = "";
+            String time2 = "";
+            String topic3 = "";
+            String time3 = "";
+            String topic4 = "";
+            String time4 = "";
+            String topic5 = "";
+            String time5 = "";
+
+            if(!tableSubjectList.get(i-5).isEmptyDate()) {
+                topic1 = tableSubjectList.get(i-5).getTopic();
+                time1 = tableSubjectList.get(i-5).getTime();
+            }
+
+            if(!tableSubjectList.get(i-4).isEmptyDate()) {
+                topic2 = tableSubjectList.get(i-4).getTopic();
+                time2 = tableSubjectList.get(i-4).getTime();
+            }
+
+            if(!tableSubjectList.get(i-3).isEmptyDate()) {
+                topic3 = tableSubjectList.get(i-3).getTopic();
+                time3 = tableSubjectList.get(i-3).getTime();
+            }
+
+            if(!tableSubjectList.get(i-2).isEmptyDate()) {
+                topic4 = tableSubjectList.get(i-2).getTopic();
+                time4 = tableSubjectList.get(i-2).getTime();
+            }
+
+            if(!tableSubjectList.get(i-1).isEmptyDate()) {
+                topic5 = tableSubjectList.get(i-1).getTopic();
+                time5 = tableSubjectList.get(i-1).getTime();
+            }
+
             tableList.add(new TableDayItem(
-                    tableSubjectList.get(i-5).getTopic(), tableSubjectList.get(i-5).getTime(),
-                    tableSubjectList.get(i-4).getTopic(), tableSubjectList.get(i-4).getTime(),
-                    tableSubjectList.get(i-3).getTopic(), tableSubjectList.get(i-3).getTime(),
-                    tableSubjectList.get(i-2).getTopic(), tableSubjectList.get(i-2).getTime(),
-                    tableSubjectList.get(i-1).getTopic(), tableSubjectList.get(i-1).getTime()
+                    topic1, time1,
+                    topic2, time2,
+                    topic3, time3,
+                    topic4, time4,
+                    topic5, time5
                     ));
         }
 

@@ -7,12 +7,14 @@ public class TableSubjectItem {
     private String timeStart;
     private String timeEnd;
     private String time;
+    private boolean emptyDate;
 
-    public TableSubjectItem(String timeIndex, String topic, String timeStart, String timeEnd) {
+    public TableSubjectItem(String timeIndex, String topic, String timeStart, String timeEnd, boolean emptyDate) {
         this.timeIndex = timeIndex;
         this.topic = topic.replace(" ", "       ");
         this.timeStart = timeStart.substring(0,2) + timeStart.substring(2,4);
         this.timeEnd = timeEnd.substring(0,2) + timeEnd.substring(2,4);
+        this.emptyDate = emptyDate;
 
         if(this.timeStart.equals("")) {
             this.time = "";
@@ -20,6 +22,8 @@ public class TableSubjectItem {
             this.time = this.timeStart +" - "+ this.timeEnd;
         }
     }
+
+    public boolean isEmptyDate() { return emptyDate; }
 
     public String getTimeIndex() {
         return timeIndex;
