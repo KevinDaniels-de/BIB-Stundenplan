@@ -1,6 +1,5 @@
 package de.kevindaniels.bib_stundenplan.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,9 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,11 +20,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import de.kevindaniels.bib_stundenplan.R;
 import de.kevindaniels.bib_stundenplan.adapter.PickerAdapter;
@@ -50,8 +43,6 @@ public class FragmentTimeTable extends Fragment implements PickerAdapter.ItemCli
     private LinearLayoutManager linearLayoutManagerPicker;
     private LinearLayoutManager linearLayoutManagerPlan;
     private RecyclerView.SmoothScroller smoothScroller;
-    public static long calenderRange;
-    public static Date calenderStart;
     public static ArrayList<TableSubjectItem> tableSubjectList;
     public static ArrayList<TableDayItem> tableList;
     public static ArrayList<PickerItem> pickerList;
@@ -69,7 +60,6 @@ public class FragmentTimeTable extends Fragment implements PickerAdapter.ItemCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        JodaTimeAndroid.init(getActivity());
     }
 
     // Erzeugt die View (Layout)

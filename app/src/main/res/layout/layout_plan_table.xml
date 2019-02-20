@@ -29,12 +29,13 @@
 
         <TextView
             android:id="@+id/date_plan_r1_f1"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:fontFamily="@font/bold"
             android:gravity="center_vertical"
-            android:text="DBK       BOC       G-Pool"
+            android:ellipsize="none"
+            android:text="###       ###       #######"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/date_plan_r1_f2"
@@ -77,12 +78,13 @@
 
         <TextView
             android:id="@+id/date_plan_r2_f1"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:fontFamily="@font/bold"
             android:gravity="center_vertical"
-            android:text="DBK       BOC       G-Pool"
+            android:ellipsize="none"
+            android:text="###       ###       #######"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/date_plan_r2_f2"
@@ -125,12 +127,13 @@
 
         <TextView
             android:id="@+id/date_plan_r3_f1"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:fontFamily="@font/bold"
             android:gravity="center_vertical"
-            android:text="DBK       BOC       G-Pool"
+            android:ellipsize="none"
+            android:text="###       ###       #######"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/date_plan_r3_f2"
@@ -173,12 +176,13 @@
 
         <TextView
             android:id="@+id/date_plan_r4_f1"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:fontFamily="@font/bold"
             android:gravity="center_vertical"
             android:text="###       ###       #######"
+            android:ellipsize="none"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/date_plan_r4_f2"
@@ -221,11 +225,12 @@
 
         <TextView
             android:id="@+id/date_plan_r5_f1"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:fontFamily="@font/bold"
             android:gravity="center_vertical"
+            android:ellipsize="none"
             android:text="###       ###       #######"
             android:textColor="@android:color/black"
             android:textSize="16sp"

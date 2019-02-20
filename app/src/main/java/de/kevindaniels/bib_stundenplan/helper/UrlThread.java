@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import de.kevindaniels.bib_stundenplan.fragments.FragmentExams;
 import de.kevindaniels.bib_stundenplan.fragments.FragmentTimeTable;
 
 public class UrlThread extends AsyncTask<String, Void, Void> {
@@ -50,9 +51,11 @@ public class UrlThread extends AsyncTask<String, Void, Void> {
         FragmentTimeTable.dataFromFile = de.kevindaniels.bib_stundenplan.helper.FileReader.readFile(context, path);
         // Erstellt die einzelnen Unterrichts-Stunden
         FragmentTimeTable.tableSubjectList = FragmentTimeTable.createTimetable();
+        FragmentExams.stundenplan = FragmentTimeTable.tableSubjectList;
         // Erstellt beide RecycleView-Items
         FragmentTimeTable.pickerList = FragmentTimeTable.createPickerList();
         FragmentTimeTable.tableList = FragmentTimeTable.createTableList();
+        FragmentExams.examsList = FragmentExams.createExamsList();
     }
 
 }
